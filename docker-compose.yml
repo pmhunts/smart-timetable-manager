@@ -1,0 +1,72 @@
+# Local infrastructure: MySQL 8 + Redis.
+#   docker compose up -d mysql redis        -> just the databases (run backend/frontend with npm)
+#   docker compose --profile app up -d      -> everything, including API + worker
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: smart-timetable-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root_password}
+      MYSQL_DATABASE: smart_timetable_db
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci", "--default-time-zone=+00:00"]
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${DB_PASSWORD:-root_password}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: smart-timetable-redis
+    restart: unless-stopped
+    # Append-only persistence so delayed BullMQ jobs survive a Redis restart.
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  api:
+    profiles: ["app"]
+    build: ./backend
+    restart: unless-stopped
+    env_file: ./backend/.env
+    environment:
+      DB_HOST: mysql
+      REDIS_URL: redis://redis:6379
+      RUN_BACKGROUND_JOBS: "false"
+    ports:
+      - "5000:5000"
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      mysql: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  worker:
+    profiles: ["app"]
+    build: ./backend
+    restart: unless-stopped
+    command: ["node", "src/worker.js"]
+    env_file: ./backend/.env
+    environment:
+      DB_HOST: mysql
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      mysql: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+volumes:
+  mysql_data:
+  redis_data:
+  uploads:

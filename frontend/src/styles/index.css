@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    @apply bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 font-sans;
+  }
+  ::selection {
+    @apply bg-accent-200 text-accent-900;
+  }
+  input[type='date']::-webkit-calendar-picker-indicator,
+  input[type='time']::-webkit-calendar-picker-indicator {
+    @apply cursor-pointer opacity-60 dark:invert;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl border border-zinc-200 bg-white shadow-soft dark:border-zinc-800 dark:bg-zinc-900;
+  }
+  .field {
+    @apply block w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400
+      transition focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/20
+      disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-500
+      dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder-zinc-500 dark:disabled:bg-zinc-800;
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-medium text-zinc-600 dark:text-zinc-400;
+  }
+  .page-title {
+    @apply text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50;
+  }
+  .muted {
+    @apply text-zinc-500 dark:text-zinc-400;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-zinc-300 dark:bg-zinc-700;
+  }
+}
