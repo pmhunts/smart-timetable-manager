@@ -138,3 +138,15 @@ test('templates render the brief examples and valid WhatsApp template params', (
   const xss = render('TASK_START', { user: { name: '<b>x</b>' }, task: { ...task, title: '<script>alert(1)</script>' } });
   assert.doesNotMatch(xss.html, /<script>/);
 });
+
+test('welcome email template and sender parsing', () => {
+  const welcome = render('WELCOME', { user: { name: 'Riya Sen', email: 'riya@example.com' } });
+  assert.equal(welcome.subject, 'Welcome to Smart Timetable Manager');
+  assert.match(welcome.text, /Hello Riya! 🎉/);
+  assert.match(welcome.html, /riya@example\.com/);
+  assert.equal(eventBlockReason({}, 'EMAIL', 'WELCOME'), null); // not affected by per-event toggles
+
+  const { parseAddress } = require('../src/notifications/channels/emailProvider');
+  assert.deepEqual(parseAddress('"Smart Timetable Manager" <me@gmail.com>'), { name: 'Smart Timetable Manager', email: 'me@gmail.com' });
+  assert.deepEqual(parseAddress('me@gmail.com'), { email: 'me@gmail.com' });
+});

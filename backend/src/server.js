@@ -12,8 +12,20 @@ async function start() {
 
   if (!whatsapp.isLive()) logger.warn('[whatsapp] WHATSAPP_MODE=mock - messages are logged, not sent');
   else if (!whatsapp.isConfigured()) logger.warn('[whatsapp] live mode but credentials are missing - sends will fail');
-  if (!email.isLive()) logger.warn('[email] EMAIL_MODE=mock - emails are logged, not sent');
-  else email.verifyConnection().catch((err) => logger.error('[email] SMTP verification failed:', err.message));
+  (email.isLive() && email.isConfigured() ? logger.info : logger.warn)(`[email] ${email.describe()}`);
+  if (email.isLive() && email.provider() === 'smtp') {
+    email
+      .verifyConnection()
+      .then(() => logger.info('[email] SMTP connection verified'))
+      .catch((err) =>
+        logger.error(
+          `[email] SMTP verification failed: ${err.message}` +
+            (/ETIMEDOUT|ECONNREFUSED|ESOCKET|timeout/i.test(`${err.code} ${err.message}`)
+              ? ' - this host may block outbound SMTP ports; use EMAIL_PROVIDER=brevo instead'
+              : '')
+        )
+      );
+  }
 
   const server = app.listen(env.port, () => logger.info(`[api] listening on http://localhost:${env.port}`));
 

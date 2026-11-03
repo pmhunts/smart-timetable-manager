@@ -280,6 +280,30 @@ const builders = {
     };
   },
 
+  WELCOME: ({ user }) => ({
+    subject: 'Welcome to Smart Timetable Manager',
+    text:
+      `Hello ${firstName(user)}! 🎉\n\n` +
+      `Your Smart Timetable Manager account (${user.email}) has been created.\n\n` +
+      'Next steps:\n• Create your first timetable\n• Set your timetable editing window\n• Choose your WhatsApp and email reminders in Notification Center\n\n' +
+      `Open your dashboard: ${env.frontendUrl}/dashboard`,
+    html: layout({
+      title: 'Welcome aboard!',
+      preheader: 'Your account has been created',
+      body:
+        p(`Hello ${firstName(user)},`) +
+        p(`Your Smart Timetable Manager account (${user.email}) has been created successfully.`) +
+        detailsTable([
+          ['1. Plan your day', 'Create your first timetable'],
+          ['2. Stay disciplined', 'Set your timetable editing window'],
+          ['3. Get reminders', 'Choose WhatsApp and email alerts in Notification Center'],
+        ]) +
+        p('Stay consistent with your daily routine!'),
+      ctaLabel: 'Open my dashboard',
+    }),
+    whatsappTemplate: { key: 'GENERIC', params: [firstName(user), 'your Smart Timetable Manager account has been created.'] },
+  }),
+
   TEST: ({ user, payload }) => ({
     subject: 'Test notification - Smart Timetable Manager',
     text: `Hello ${firstName(user)}! ✅\n\nThis is a test ${payload.channel === 'WHATSAPP' ? 'WhatsApp message' : 'email'} from Smart Timetable Manager. Your notifications are configured correctly.`,

@@ -9,6 +9,7 @@ const logger = require('../utils/logger');
 const { isValidTimezone } = require('../utils/time');
 const { TIMETABLE_SETTING_DEFAULTS } = require('./settingsService');
 const emailProvider = require('../notifications/channels/emailProvider');
+const notifications = require('../notifications/notificationService');
 const { layout, p } = require('../notifications/templates/emailLayout');
 
 // Used to keep login timing constant when the email does not exist.
@@ -40,6 +41,8 @@ async function register({ name, email, countryCode, phoneNumber, password, timez
     await NotificationSetting.create({ userId: created.id }, { transaction });
     return created;
   });
+  // Queued after commit; a mail problem must never block sign-up (it shows up in Notification History).
+  await notifications.sendWelcome(user).catch((err) => logger.error('[auth] could not queue welcome email:', err.message));
   return { user, token: signToken(user) };
 }
 

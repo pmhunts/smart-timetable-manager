@@ -12,7 +12,9 @@ const { notFound, errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
 
-app.set('trust proxy', 1); // correct client IPs for rate limiting behind a reverse proxy
+// Number of reverse proxies in front of the app, so rate limiting sees the real client IP
+// (e.g. 2 for Vercel rewrite -> Render load balancer).
+app.set('trust proxy', env.trustProxy);
 app.disable('x-powered-by');
 
 app.use(

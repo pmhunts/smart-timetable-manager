@@ -292,7 +292,19 @@ function sendTest(user, channel) {
   });
 }
 
+/** Welcome email for a newly registered account. The key is per user, so it is sent once at most. */
+function sendWelcome(user) {
+  return ensureNotification({
+    user,
+    channel: 'EMAIL',
+    eventType: 'WELCOME',
+    key: `WELCOME-EMAIL-u${user.id}`,
+    scheduledAt: new Date(),
+  });
+}
+
 module.exports = {
+  sendWelcome,
   ensureNotification,
   cancelPending,
   cancelTaskReminders,

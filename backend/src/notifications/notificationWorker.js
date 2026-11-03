@@ -12,7 +12,7 @@ const { getNotificationSettings } = require('../services/settingsService');
 const { render } = require('./templates');
 const whatsapp = require('./channels/whatsappProvider');
 const email = require('./channels/emailProvider');
-const { REMINDER_EVENTS, channelBlockReason, eventBlockReason, quietHoursEnd } = require('./preferences');
+const { REMINDER_EVENTS, TRANSACTIONAL_EVENTS, channelBlockReason, eventBlockReason, quietHoursEnd } = require('./preferences');
 const { taskSnapshot } = require('./notificationService');
 const queue = require('./queue');
 
@@ -54,7 +54,7 @@ function evaluate({ log, user, settings, task, now }) {
     return { action: 'cancel', reason: `Expired: more than ${env.queue.staleMinutes} minutes late` };
   }
 
-  if (log.eventType !== 'TEST') {
+  if (!TRANSACTIONAL_EVENTS.includes(log.eventType)) {
     const quietEnd = quietHoursEnd(settings, user.timezone, now);
     if (quietEnd) {
       // Reminders are pointless after quiet hours; informational messages are delayed instead.

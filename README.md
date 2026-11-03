@@ -145,6 +145,15 @@ before you have credentials.
 2. **Gmail:** turn on 2-Step Verification, then create an **App Password** (Google Account → Security →
    App passwords) and use it as `SMTP_PASS`, with host `smtp.gmail.com` and port `587` (`SMTP_SECURE=false`).
 3. Restart the backend; it verifies the SMTP connection at startup. Use **Notification Center → Send test email**.
+4. **Hosts that block SMTP (e.g. Render free tier):** use the Brevo HTTPS API instead. Create a free
+   account at <https://www.brevo.com>, verify your sender address (*Senders, Domains & Dedicated IPs*),
+   create an API key (*SMTP & API → API keys*), and set `EMAIL_MODE=live`, `EMAIL_PROVIDER=brevo`,
+   `BREVO_API_KEY=...`, `EMAIL_FROM="Smart Timetable Manager <your-verified@address>"`.
+5. **On a hosting platform**, `backend/.env` is not deployed (it is gitignored). Set the same variables in
+   the platform's environment settings. The first startup log line `[email] ...` shows whether
+   email is live or mock.
+
+New accounts automatically receive a **welcome email** (sent once per account, visible in Notification History).
 
 ## 4. WhatsApp Cloud API setup
 

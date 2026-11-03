@@ -14,6 +14,7 @@ const env = {
     .map((s) => s.trim())
     .filter(Boolean),
   runBackgroundJobs: bool(process.env.RUN_BACKGROUND_JOBS, true),
+  trustProxy: int(process.env.TRUST_PROXY, 1),
 
   jwt: {
     secret: process.env.JWT_SECRET,
@@ -35,6 +36,8 @@ const env = {
 
   email: {
     mode: (process.env.EMAIL_MODE || 'mock').toLowerCase(),
+    provider: (process.env.EMAIL_PROVIDER || 'smtp').toLowerCase(),
+    brevoApiKey: process.env.BREVO_API_KEY,
     host: process.env.SMTP_HOST,
     port: int(process.env.SMTP_PORT, 587),
     secure: bool(process.env.SMTP_SECURE, false),

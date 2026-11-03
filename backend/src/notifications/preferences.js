@@ -10,6 +10,8 @@ const REMINDER_EVENTS = ['ADVANCE_REMINDER', 'TASK_START', 'INCOMPLETE_REMINDER'
 const UPDATE_EVENTS = ['TASK_CREATED', 'TASK_UPDATED', 'TIMETABLE_CREATED', 'TIMETABLE_UPDATED'];
 const DELETION_EVENTS = ['TASK_DELETED', 'TIMETABLE_DELETED'];
 const SCHEDULED_EVENTS = [...REMINDER_EVENTS, 'DAILY_SUMMARY'];
+// Account/system messages: not controlled by per-event toggles and never held back by quiet hours.
+const TRANSACTIONAL_EVENTS = ['TEST', 'WELCOME'];
 
 const prefix = (channel) => (channel === 'WHATSAPP' ? 'whatsapp' : 'email');
 
@@ -46,6 +48,7 @@ function eventBlockReason(settings, channel, eventType, task) {
     case 'DAILY_SUMMARY':
       return settings[`${p}DailySummary`] ? null : 'Daily summary is turned off';
     case 'TEST':
+    case 'WELCOME':
       return null;
     default:
       if (UPDATE_EVENTS.includes(eventType)) return settings[`${p}UpdateNotification`] ? null : 'Update notifications are turned off';
@@ -73,6 +76,7 @@ module.exports = {
   UPDATE_EVENTS,
   DELETION_EVENTS,
   SCHEDULED_EVENTS,
+  TRANSACTIONAL_EVENTS,
   channelBlockReason,
   eventBlockReason,
   quietHoursEnd,
